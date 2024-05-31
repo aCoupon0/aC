@@ -88,15 +88,15 @@
           precioFinal: precioFinal
         })
       })
-      .then(response => {
+      .then(response => response.json().then(data => {
         if (response.status === 408) {
           alert("La conexión es un poco lenta, por favor presiona el botón \"Pedir\" nuevamente.");
         } else if (response.ok) {
           window.location.href = '/confirm';
         } else {
-          alert("Error al guardar los datos. Por favor intenta nuevamente.");
+          alert(data.message || "Error al guardar los datos. Por favor intenta nuevamente.");
         }
-      })
+      }))
       .catch(error => {
         console.error('Error al guardar los datos:', error);
         alert("Error al guardar los datos. Por favor intenta nuevamente.");
@@ -137,3 +137,4 @@
 </body>
 
 </html>
+
