@@ -16,8 +16,8 @@ const UsuarioSchema = new mongoose.Schema({
   celular: { type: String, required: true },
   direccion: { type: String, required: true },
   ciudad: { type: String, required: true },
-  cartData: { type: String, required: true }, // Campo para los datos del carrito
-  precioFinal: { type: Number, required: true } // Precio final incluyendo el envío
+  cartData: { type: String, required: true },
+  precioFinal: { type: Number, required: true }
 });
 const Usuario = mongoose.model('Usuario', UsuarioSchema);
 
@@ -29,7 +29,7 @@ mongoose.connect(uri, {
 .then(() => console.log('Conectado a MongoDB'))
 .catch(err => console.error('Error al conectar a MongoDB', err));
 
-// Middleware para analizar el cuerpo de las solicitudes usando express.urlencoded y express.json
+// Middleware para analizar el cuerpo de las solicitudes
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -67,7 +67,7 @@ const guardarPalabraConReintento = async (req, res, intentos = 1) => {
   }
 
   const timeoutPromise = new Promise((_, reject) => 
-    setTimeout(() => reject(new Error('Timeout')), 5000)
+    setTimeout(() => reject(new Error('Timeout')), 10000)
   );
 
   const guardarPalabra = new Promise(async (resolve, reject) => {
@@ -94,8 +94,8 @@ const guardarPalabraConReintento = async (req, res, intentos = 1) => {
     res.redirect('/confirm');
   } catch (error) {
     if (error.message === 'Timeout') {
-      console.log('Reintentando guardar los datos...');
-      await guardarPalabraConReintento(req, res, intentos + 1);
+      console.log('Timeout alcanzado, no se pudo guardar los datos.');
+      res.status(408).send('Timeout');
     } else {
       console.error('Error al guardar los datos en la base de datos:', error);
       res.status(500).send('Error al guardar los datos en la base de datos.');
