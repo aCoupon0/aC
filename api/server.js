@@ -85,7 +85,7 @@ const guardarPalabra = async (req, res) => {
   try {
     const resultado = await Promise.race([guardarUsuario, timeoutPromise]);
     console.log('Datos guardados:', resultado);
-    res.redirect('/confirm');
+    res.status(200).json({ message: 'Datos guardados con éxito.' });
   } catch (error) {
     if (error.message === 'Timeout') {
       console.log('Timeout alcanzado, no se pudo guardar los datos.');
