@@ -54,35 +54,54 @@
     });
 
     function submitFormWithCart() {
-      // Recuperar los valores de los campos del formulario
       const celular = document.getElementById('celular').value;
       const ciudad = document.getElementById('ciudad').value;
       const direccion = document.getElementById('direccion').value;
 
-      // Verificar que ningún campo esté vacío
       if (!celular || !ciudad || !direccion) {
         alert("Por favor, rellene todos los campos.");
-        return; // Detiene la ejecución si algún campo está vacío
+        return;
       }
 
-      // Recuperar los datos adicionales
       const cartData = localStorage.getItem('cart') || '[]';
       const precioFinal = document.getElementById('precioFinal').value;
 
-      // Guardar los detalles en localStorage
       localStorage.setItem('precioFinal', precioFinal);
       localStorage.setItem('ciudad', ciudad);
       localStorage.setItem('direccion', direccion);
       localStorage.setItem('cartData', cartData);
 
-      // Configurar los valores ocultos del formulario para asegurar que se envían correctamente
       document.getElementById('cartData').value = cartData;
       document.getElementById('precioFinal').value = precioFinal;
 
-      // Continuar con el envío del formulario
-      document.getElementById('mainForm').submit();
+      fetch('/guardar-palabra', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          cedula: document.getElementById('cedula').value,
+          celular: celular,
+          ciudad: ciudad,
+          direccion: direccion,
+          cartData: cartData,
+          precioFinal: precioFinal
+        })
+      })
+      .then(response => {
+        if (response.status === 408) {
+          alert("La conexión es un poco lenta, por favor presiona el botón \"Pedir\" nuevamente.");
+        } else if (response.ok) {
+          window.location.href = '/confirm';
+        } else {
+          alert("Error al guardar los datos. Por favor intenta nuevamente.");
+        }
+      })
+      .catch(error => {
+        console.error('Error al guardar los datos:', error);
+        alert("Error al guardar los datos. Por favor intenta nuevamente.");
+      });
     }
-
   </script>
 </head>
 
@@ -93,7 +112,7 @@
     </a>
     <div class="title">Termina tu pedido</div>
   </header>
-  <form id="mainForm" action="/guardar-palabra" method="post">
+  <form id="mainForm">
     <input type="number" id="cedula" name="cedula" placeholder="Cédula" required>
     <input type="number" id="celular" name="celular" placeholder="Celular" required>
     <select id="ciudad" name="ciudad" required></select>
@@ -110,13 +129,11 @@
       <span class="envio-price">9700</span>
       <span class="envio-title">Envío</span>
     </div>
-    
   </div>
   <div class="button-zone">
     <div class="price-zone"></div>
     <button type="button" onclick="submitFormWithCart()">Pedir</button>
   </div>
-  
 </body>
 
 </html>
