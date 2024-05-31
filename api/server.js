@@ -60,19 +60,13 @@ app.get('/clavel', (req, res) => {
 });
 
 // Función para manejar la solicitud del formulario y guardar datos en MongoDB
-const guardarPalabraConReintento = async (req, res, intentos = 1) => {
-  if (intentos > 3) {
-    console.error('Error: máximo número de intentos alcanzado');
-    return res.status(500).json({ message: 'Error al guardar los datos en la base de datos.' });
-  }
-
+const guardarPalabra = async (req, res) => {
   const timeoutPromise = new Promise((_, reject) => 
     setTimeout(() => reject(new Error('Timeout')), 10000)
   );
 
-  const guardarPalabra = new Promise(async (resolve, reject) => {
+  const guardarUsuario = new Promise(async (resolve, reject) => {
     try {
-      console.log('Intento:', intentos);
       const nuevoUsuario = new Usuario({
         cedula: req.body.cedula,
         celular: req.body.celular,
@@ -89,7 +83,7 @@ const guardarPalabraConReintento = async (req, res, intentos = 1) => {
   });
 
   try {
-    const resultado = await Promise.race([guardarPalabra, timeoutPromise]);
+    const resultado = await Promise.race([guardarUsuario, timeoutPromise]);
     console.log('Datos guardados:', resultado);
     res.redirect('/confirm');
   } catch (error) {
@@ -103,13 +97,14 @@ const guardarPalabraConReintento = async (req, res, intentos = 1) => {
   }
 };
 
-// Ruta para manejar la solicitud del formulario y guardar datos en MongoDB con reintentos
+// Ruta para manejar la solicitud del formulario y guardar datos en MongoDB
 app.post('/guardar-palabra', async (req, res) => {
-  await guardarPalabraConReintento(req, res);
+  await guardarPalabra(req, res);
 });
 
 // Iniciar el servidor
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
+
 
