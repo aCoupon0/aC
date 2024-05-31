@@ -63,7 +63,7 @@ app.get('/clavel', (req, res) => {
 const guardarPalabraConReintento = async (req, res, intentos = 1) => {
   if (intentos > 3) {
     console.error('Error: máximo número de intentos alcanzado');
-    return res.status(500).send('Error al guardar los datos en la base de datos.');
+    return res.status(500).json({ message: 'Error al guardar los datos en la base de datos.' });
   }
 
   const timeoutPromise = new Promise((_, reject) => 
@@ -95,10 +95,10 @@ const guardarPalabraConReintento = async (req, res, intentos = 1) => {
   } catch (error) {
     if (error.message === 'Timeout') {
       console.log('Timeout alcanzado, no se pudo guardar los datos.');
-      res.status(408).send('Timeout');
+      res.status(408).json({ message: 'Timeout' });
     } else {
       console.error('Error al guardar los datos en la base de datos:', error);
-      res.status(500).send('Error al guardar los datos en la base de datos.');
+      res.status(500).json({ message: 'Error al guardar los datos en la base de datos.' });
     }
   }
 };
